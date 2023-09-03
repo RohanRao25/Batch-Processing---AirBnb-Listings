@@ -1,5 +1,5 @@
 from pyspark.sql import SparkSession
-from constants import root_name
+from utils.constants import root_name
 
 
 class Log4j:

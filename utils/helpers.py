@@ -1,5 +1,5 @@
 from configparser import ConfigParser
-from constants import spark_config_rel_path
+from utils.constants import spark_config_rel_path
 import os
 
 

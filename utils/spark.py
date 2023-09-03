@@ -1,7 +1,7 @@
 from pyspark.sql import SparkSession
 from pyspark import SparkConf
-from helpers import Read_Config_Files
-from logger import Log4j
+from utils.helpers import Read_Config_Files
+from utils.logger import Log4j
 import os
 
 
@@ -19,6 +19,7 @@ def Initialize_Spark():
 
         sparkSession = SparkSession.builder.config(conf = sparkConf).getOrCreate()
     logger = Log4j(sparkSession)
+    logger.info("Spark Session Started...")
 
     return sparkSession, logger
 
