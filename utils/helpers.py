@@ -1,6 +1,8 @@
 from configparser import ConfigParser
-from utils.constants import spark_config_rel_path
+from utils.constants import spark_config_rel_path, pattern
 import os
+import re
+import pandas as pd
 
 
 def Read_Config_Files(config_indicator):
@@ -16,6 +18,16 @@ def Read_Config_Files(config_indicator):
         dict_config.update({key:val})
 
     return dict_config
+
+
+def Convert_Scientific_To_Real(val):
+    return float(val)
+
+def Remove_Spec_Chars(val):
+    if not pd.isna(val):
+        return re.sub(pattern," ",val)
+    else:
+        return val
 
 
 
