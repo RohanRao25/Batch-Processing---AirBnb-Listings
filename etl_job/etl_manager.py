@@ -8,14 +8,17 @@ sys.path.append(root_directory)
 from utils.spark import Initialize_Spark
 from utils.constants import date_Format
 from etl_job.extract import Extract_data
-from etl_job.data_pre_processing import Pre_Process_Data
+from etl_job.data_pre_processing import Pre_Process__Listings_Data
+from etl_job.transform import Transform_data
 
 def Manage_Pipeline():
     
-    pre_Processed_Data = Pre_Process_Data()
+    pre_Processed_Data = Pre_Process__Listings_Data()
     #Start the Spark Session
     sparkSession, logger = Initialize_Spark()
-    Extract_data(pre_Processed_Data,sparkSession,date_Format)
+    data_dict = Extract_data(pre_Processed_Data,sparkSession,date_Format)
+    Transform_data(data_dict)
+
 
 
 
