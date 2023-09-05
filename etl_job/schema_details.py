@@ -1,0 +1,48 @@
+from pyspark.sql.types import StructField, StructType, IntegerType,StringType,FloatType,LongType,DateType
+listings_Data_schema = StructType([
+    StructField("id",LongType()),
+    StructField("listing_url",StringType()),
+    StructField("name",StringType()),
+    StructField("description",StringType()),
+    StructField("neighborhood_overview", StringType()),
+    StructField("transit",StringType()),
+    StructField("house_rule",StringType()),
+    StructField("picture_url",StringType()),
+    StructField("host_id",LongType()),
+    StructField("host_url",StringType()),
+    StructField("host_name",StringType()),
+    StructField("host_since",DateType()),
+    StructField("host_about",StringType()),
+    StructField("host_is_superhost",StringType()),
+    StructField("host_picture_url",StringType()),
+    StructField("host_total_listings_count",IntegerType()),
+    StructField("host_verifications",StringType()),
+    StructField("host_identity_verified",StringType()),
+    StructField("neighbourhood_cleansed",StringType()),
+    StructField("city",StringType()),
+    StructField("state",StringType()),
+    StructField("zipcode",StringType()),
+    StructField("country",StringType()),
+    StructField("latitude",FloatType()),
+    StructField("longitude",FloatType()),
+    StructField("property_type",StringType()),
+    StructField("room_type",StringType()),
+    StructField("accommodates",IntegerType()),
+    StructField("bathrooms",FloatType()),
+    StructField("bedrooms",IntegerType()),
+    StructField("beds",IntegerType()),
+    StructField("bed_type",StringType()),
+    StructField("amenities",StringType()),
+    StructField(("price"),StringType()),
+    StructField(("security_deposit"),StringType()),
+
+])
+
+reviews_data_schema = StructType([
+    StructField("listing_id",LongType()),
+    StructField("id",IntegerType()),
+    StructField("date",StringType()),
+    StructField("reviewer_id",IntegerType()),
+    StructField("reviewer_name",StringType()),
+    StructField("comments",StringType())
+])
