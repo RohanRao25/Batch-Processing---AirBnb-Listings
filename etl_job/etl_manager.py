@@ -10,14 +10,14 @@ from utils.constants import date_Format
 from etl_job.extract import Extract_data
 from etl_job.data_pre_processing import Pre_Process__Listings_Data
 from etl_job.transform import Transform_data
+from etl_job.load import Load_df_To_DB
 
 def Manage_Pipeline():
     
     pre_Processed_Data = Pre_Process__Listings_Data()
     #Start the Spark Session
     sparkSession, logger = Initialize_Spark()
-    data_dict = Extract_data(pre_Processed_Data,sparkSession,date_Format)
-    Transform_data(data_dict)
+    Load_df_To_DB( Transform_data(Extract_data(pre_Processed_Data,sparkSession,date_Format,logger),logger),logger)
 
 
 

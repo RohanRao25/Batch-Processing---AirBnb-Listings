@@ -1,6 +1,7 @@
 from pyspark.sql import dataframe,Window
-from pyspark.sql.functions import to_date,split,explode,row_number, monotonically_increasing_id,trim
+from pyspark.sql.functions import to_date,split,explode,row_number, monotonically_increasing_id,trim,concat_ws,substring, col
 import os,sys
+from timeit import default_timer as timer
 # Add the root_directory to the Python path
 root_directory = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 sys.path.append(root_directory)
@@ -22,9 +23,12 @@ def Convert_To_Date_Field(df,column_name):
 def Create_Dim_And_Facts_Dataframes(df:dataframe,df_Name):
     df_dict = {}
     if df_Name == "listing":
-        host_listing_dim_df = df.dropDuplicates(["idn_host"]).select("idn_host","txt_url_host","txt_nam_host","txt_abt_host","ind_suprhost", \
-                                                                 "txt_url_pic_host","txt_vrfctn_host" \
-                                             ,"ind_vrfd_host","txt_nam_street","txt_state","txt_zip_host","cnt_lstng_host","txt_nam_country")
+        host_dim_df = df.dropDuplicates(["idn_host"]).select(concat_ws(",",df.txt_nam_street,df.txt_nam_country,df.txt_state).alias("txt_addr_host"),"idn_host","txt_url_host","txt_nam_host","txt_abt_host","ind_suprhost", \
+                                                                 "txt_url_pic_host" \
+                                             ,"ind_vrfd_host","txt_zip_host","cnt_lstng_host",df.txt_nam_country.alias("txt_loc_host"))
+        
+        host_dim_df = host_dim_df.select([substring(col(f),0,100).alias(f) for f in host_dim_df.columns])
+        df_dict["dim.t_host_det_dim"] = host_dim_df
         
         #Code block for verification dimension table
         vrfctn_mthd_df = df.select("idn_host","txt_vrfctn_host")
@@ -35,7 +39,7 @@ def Create_Dim_And_Facts_Dataframes(df:dataframe,df_Name):
         w = Window.orderBy("counter")
         vrfctn_mthd_dim_df = vrfctn_mthd_dim_df.withColumn("idn_vrfctn_mthd",row_number().over(w))
         vrfctn_mthd_dim_df = vrfctn_mthd_dim_df.drop("counter")
-        df_dict["vfctn_mthd_dim"] = vrfctn_mthd_dim_df
+        df_dict["dim.t_vrfctn_mthd_dim"] = vrfctn_mthd_dim_df
 
         #Code block for verification dimension table ends here
 
@@ -47,8 +51,8 @@ def Create_Dim_And_Facts_Dataframes(df:dataframe,df_Name):
         w = Window.orderBy("counter")
         host_vrfctn_mthd_facts_dim = host_vrfctn_mthd_facts_dim.withColumn("idn_host_vrfctn",row_number().over(w))
         host_vrfctn_mthd_facts_dim = host_vrfctn_mthd_facts_dim.drop("counter")
-        host_vrfctn_mthd_facts_dim.show()
-        df_dict["host_vrfctn_mthd_facts"] = host_vrfctn_mthd_facts_dim
+        
+        df_dict["facts.t_host_vrfctn_fact"] = host_vrfctn_mthd_facts_dim
         #host verification facts table code ends here
 
         #Code block for aminites dimension table
@@ -61,8 +65,8 @@ def Create_Dim_And_Facts_Dataframes(df:dataframe,df_Name):
         w = Window.orderBy("counter")
         amnts_dim_df = amnts_dim_df.withColumn("idn_amnts",row_number().over(w))
         amnts_dim_df = amnts_dim_df.drop("counter")
-        amnts_dim_df.show()
-        df_dict["amnts_dim_df"] = amnts_dim_df
+        
+        df_dict["dim.t_amnts_dim "] = amnts_dim_df
 
         #Code block for aminites dimension table ends here
 
@@ -74,23 +78,23 @@ def Create_Dim_And_Facts_Dataframes(df:dataframe,df_Name):
         w = Window.orderBy("counter")
         lstng_amnts_facts_df = lstng_amnts_facts_df.withColumn("idn_prop_amnts",row_number().over(w))
         lstng_amnts_facts_df = lstng_amnts_facts_df.drop("counter")
-        lstng_amnts_facts_df.show()
-        df_dict["lstng_amnts_facts"] = lstng_amnts_facts_df
+        
+        df_dict["facts.t_prop_amnts_fact"] = lstng_amnts_facts_df
         #listing amnities facts table code ends here
 
 
         print(df.columns)
 
         #Code block for prop listing dimension table
-        df.show()
+        
 
         listing_df = df.select("idn_lstng","txt_url_lstng","txt_nam_lstng","txt_desc_lstng","txt_dtl_nbrhd", \
                                "txt_dtl_trnst", "txt_rule_lstng", "txt_url_poc_lstng","txt_type_prop","txt_type_room" \
-                                ,"accommodates","cnt_bathroom","cnt_bed","type_bed","txt_nam_amnts","latitude" \
-                                    ,"longitude","lstng_price","security_deposit")
+                                ,"accommodates","cnt_bathroom","cnt_bed","type_bed",\
+                                    "lstng_price","security_deposit",concat_ws(",",df.latitude,df.longitude))
 
-        listing_df.show()
-        df_dict["listing_dim"] = listing_df
+        listing_df = listing_df.select([substring(col(f),0,100).alias(f) for f in listing_df.columns])
+        df_dict["dim.t_prop_lstng_dim"] = listing_df
 
         #Code block for prop listing dimension table ends here
 
@@ -101,9 +105,9 @@ def Create_Dim_And_Facts_Dataframes(df:dataframe,df_Name):
         w = Window.orderBy("counter")
         host_listing_facts_df = host_listing_facts_df.withColumn("idn_host_lstng",row_number().over(w))
         host_listing_facts_df = host_listing_facts_df.drop("counter")
-        host_listing_facts_df.show()
-        df_dict["host_listing_facts"] = host_listing_facts_df
-        host_listing_dim_df
+        
+        df_dict["facts.t_host_lstng_fact"] = host_listing_facts_df
+        
 
         #code block for host listing facts table ends here
     
@@ -111,32 +115,44 @@ def Create_Dim_And_Facts_Dataframes(df:dataframe,df_Name):
          #Customer dim table starts from here
 
          customer_dim_df = df.select("idn_customer","txt_nam_customer")
-         customer_dim_df.show()
-         df_dict["customer_dim"] = customer_dim_df
+         
+         df_dict["dim.t_customer_dim"] = customer_dim_df
          print(df.columns)
 
          #Customer dim table code block ends here
 
          #customer review facts table starts here
          customer_rwview_facts_df = df.select("idn_listing","idn_review","dte_review","idn_customer","txt_review")
-         customer_rwview_facts_df.show()
-         df_dict["customer_rev_facts"] = customer_rwview_facts_df
+         
+         df_dict["facts.t_customer_review_fact"] = customer_rwview_facts_df
 
          #customer review facts table ends here
+    return df_dict
 
 
 
 
 
-def Transform_data(data_Dict):
+
+def Transform_data(data_Dict,logger):
+    logger.info("Transformation Operation started...")
+    start = timer()
+    df_Dict = {}
     for key,val in data_Dict.items():
         if key == "listing":
             
             df2 = val.transform(Rename_Columns,listing_df_column_name_dict).transform(Convert_To_Date_Field,"dte_frm_host")
             
-            Create_Dim_And_Facts_Dataframes(df2,key)
+            listing_Dict = Create_Dim_And_Facts_Dataframes(df2,key)
 
         elif key == "reviews":
             df2 = val.transform(Rename_Columns,reviews_df_column_name_dict).transform(Convert_To_Date_Field,"dte_review")
-            Create_Dim_And_Facts_Dataframes(df2,key)
+            review_Dict = Create_Dim_And_Facts_Dataframes(df2,key)
+        
+        
+    df_Dict = {**listing_Dict,**review_Dict}
+    end = timer()
+    logger.info("Transformation operation compplete! Time Elapsed - {}".format(str(end-start)))
+
+    return df_Dict
  

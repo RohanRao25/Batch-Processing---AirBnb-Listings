@@ -19,7 +19,7 @@ def Initialize_Spark():
 
         sparkSession = SparkSession.builder.config(conf = sparkConf).getOrCreate()
     logger = Log4j(sparkSession)
-    logger.info("Spark Session Started...")
+    logger.warn("Spark Session Started...")
 
     return sparkSession, logger
 
