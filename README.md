@@ -1,15 +1,15 @@
 # Batch-Processing---AirBnb-Listings
-<h3>Introduction</h3><hr></br>
+<h3>Introduction</h3><hr>
  <p>This is a batch processing application to extract AirBnb listings data from a  CSV file, cleanse it and store it in a SQL Server Database</p>
 
- <h3>Architecture</h3></br><hr></br>
+ <h3>Architecture</h3><hr>
 
  ![image](https://github.com/RohanRao25/Batch-Processing---AirBnb-Listings/assets/53894044/821a161c-2259-4a69-9d8e-2d7559879d3f)
 
 
-<h3>Project Structure</h3></br><hr></br>
-<p>root/</p></br>
- <p>|-- configs/</p></br>
+<h3>Project Structure</h3><hr>
+<p>root/</p>
+ <p>|-- configs/</p>
  <p>|   |-- spark.conf</p></br>
  <p>|-- Data Model/</p></br>
  <p>|   |-- Data_Model.png</p></br>
