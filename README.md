@@ -1,5 +1,8 @@
 # Batch-Processing---AirBnb-Listings
+<b>Introduction</b>
  This is a batch processing application to extract AirBnb listings data from a  CSV file, cleanse it and store it in a SQL Server Database
+
+
 Project Structure :-
 root/
  |-- configs/
