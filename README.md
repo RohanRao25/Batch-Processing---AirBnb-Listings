@@ -4,7 +4,7 @@
 
 <h3>Technologies Used</h3><hr>
 <ul>
-    <li>Programming Language - Python/li>
+    <li>Programming Language - Python</li>
     <li>Tools - Spark, SQL Server 2019</li>
 </ul>
 
@@ -18,7 +18,7 @@
  ![image](https://github.com/RohanRao25/Batch-Processing---AirBnb-Listings/assets/53894044/efec255a-e64e-47a2-adce-dcfbe405ba91)
 
 
- <h3>Data Set</h3><<hr>
+ <h3>Data Set</h3><hr>
  <p>Link :<a href="https://www.kaggle.com/datasets/erikbruin/airbnb-amsterdam">AirBnb Amsterdam Dataset</a></p>
  
 
